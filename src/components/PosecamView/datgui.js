@@ -140,10 +140,7 @@ function DatGui(props) {
     });
   }
 
-  return (
-    <>
-    </>
-  );
+  return null;
 }
 
 export default DatGui
