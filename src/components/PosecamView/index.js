@@ -176,10 +176,6 @@ const PosecamView = (props) => {
     setupDetector(() => animate());
   }
 
-  useEffect(() => {
-    return (() => { cancelAnimationFrame(rafId.current) })
-  });
-
   return (
     <div>
       <Webcam ref={webcamRef} mirrored style={style} />
