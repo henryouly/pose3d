@@ -1,12 +1,13 @@
 import { Canvas } from '@react-three/fiber';
-import React, { Suspense, useRef } from 'react';
+import React, { Suspense, useRef, useState } from 'react';
 import FPSStats from "react-fps-stats";
 import PosecamView from './components/PosecamView';
 import Lights from './components/Three/lights.js';
-import Mousy from './components/Three/mousy.js';
+import Characters from './components/Three/characters';
 
 function App() {
   const keypoints = useRef(null);
+  const [character, setCharacter] = useState("Mousy");
 
   return (
     <>
@@ -19,12 +20,12 @@ function App() {
           <Lights />
           <Suspense fallback={null}>
             <mesh position={[0,-1,0]}>
-              <Mousy keypoints={keypoints}/>
+              <Characters keypoints={keypoints} model={character}/>
             </mesh>
           </Suspense>
         </Canvas>
     </div>
-    <PosecamView keypoints={keypoints}/>
+    <PosecamView keypoints={keypoints} setCharacter={setCharacter} />
     <FPSStats top={"auto"} right={"auto"}/>
     </>
   );

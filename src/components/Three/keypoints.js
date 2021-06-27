@@ -1,38 +1,34 @@
 import * as THREE from "three";
 
 const CONFIDENCE = 0.5
-const NO_ROTATION = new THREE.Euler(0, 0, 0);
+const NO_ROTATION = 0;
 
-function getLeftArmRotation(kp) {
+function getLeftArmAngle(kp) {
   if (kp[11].score < CONFIDENCE || kp[12].score < CONFIDENCE || kp[13].score < CONFIDENCE) {
     return NO_ROTATION;
   }
-  const x = getAngle(kp[12], kp[11], kp[13]);
-  return new THREE.Euler(x, 0, 0);
+  return getAngle(kp[12], kp[11], kp[13]);
 }
 
-function getLeftForearmRotation(kp) {
+function getLeftForearmAngle(kp) {
   if (kp[11].score < CONFIDENCE || kp[13].score < CONFIDENCE || kp[15].score < CONFIDENCE) {
     return NO_ROTATION;
   }
-  const x = getAngle(kp[11], kp[13], kp[15]);
-  return new THREE.Euler(x, 0, 0);
+  return getAngle(kp[11], kp[13], kp[15]);
 }
 
-function getRightArmRotation(kp) {
+function getRightArmAngle(kp) {
   if (kp[11].score < CONFIDENCE || kp[12].score < CONFIDENCE || kp[14].score < CONFIDENCE) {
     return NO_ROTATION;
   }
-  const x = -getAngle(kp[11], kp[12], kp[14]);
-  return new THREE.Euler(x, 0, 0);
+  return getAngle(kp[11], kp[12], kp[14]);
 }
 
-function getRightForearmRotation(kp) {
+function getRightForearmAngle(kp) {
   if (kp[12].score < CONFIDENCE || kp[14].score < CONFIDENCE || kp[16].score < CONFIDENCE) {
     return NO_ROTATION;
   }
-  const x = -getAngle(kp[12], kp[14], kp[16]);
-  return new THREE.Euler(x, 0, 0);
+  return getAngle(kp[12], kp[14], kp[16]);
 }
 
 function getAngle(first, middle, last) {
@@ -64,4 +60,4 @@ function normalize(min, max, val) {
   return ((val - min) / (max - min)) * Math.PI;
 }
 
-export { getLeftArmRotation, getRightArmRotation, getHeadRotation, getLeftForearmRotation, getRightForearmRotation }
+export { getLeftArmAngle, getRightArmAngle, getHeadRotation, getLeftForearmAngle, getRightForearmAngle }

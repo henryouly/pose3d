@@ -19,12 +19,20 @@ import * as dat from 'dat.gui';
 import { useEffect, useState } from 'react';
 import * as params from './params';
 
-function DatGui(_props) {
-  const [model, setModel] = useState(SupportedModels.BlazePose)
+function DatGui(props) {
+  const [model, setModel] = useState(SupportedModels.BlazePose);
 
   useEffect(() => {
     const gui = new dat.GUI({ width: 300 });
     gui.domElement.id = 'gui';
+
+    // The character folder allows choosing different characters
+    const characterFolder = gui.addFolder('Charactor');
+    const characterController = characterFolder.add(
+      params.STATE, 'character', ["Mousy", "Boy"]);
+    characterController.onChange(value => props.setCharacter(value));
+    characterFolder.open();
+
     // The model folder contains options for model selection.
     const modelFolder = gui.addFolder('Model');
     params.STATE.model = model;
@@ -42,7 +50,7 @@ function DatGui(_props) {
     const backendFolder = gui.addFolder('Backend');
     showBackendConfigs(backendFolder);
     backendFolder.open();
-  })
+  }, [])
 
   function showModelConfigs(folderController, type) {
     // Clean up model configs for the previous model.

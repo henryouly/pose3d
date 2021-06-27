@@ -173,7 +173,7 @@ const PosecamView = (props) => {
     <div>
       <Webcam ref={webcamRef} mirrored style={style} />
       <canvas ref={canvasRef} style={style} />
-      <DatGui />
+      <DatGui setCharacter={props.setCharacter} />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei'
+import * as THREE from "three";
 
 import * as keypoints from './keypoints';
 
@@ -16,12 +17,20 @@ export default function Mousy(props) {
 
     if (typeof kp !== "undefined" && kp !== null) {
       nodes.Ch14.skeleton.bones[5].setRotationFromEuler(keypoints.getHeadRotation(kp));
-      nodes.Ch14.skeleton.bones[8].setRotationFromEuler(keypoints.getLeftArmRotation(kp));
-      nodes.Ch14.skeleton.bones[9].setRotationFromEuler(keypoints.getLeftForearmRotation(kp));
-      nodes.Ch14.skeleton.bones[28].setRotationFromEuler(keypoints.getRightArmRotation(kp));
-      nodes.Ch14.skeleton.bones[29].setRotationFromEuler(keypoints.getRightForearmRotation(kp));
+      nodes.Ch14.skeleton.bones[8].setRotationFromEuler(applyRotationLeft(keypoints.getLeftArmAngle(kp)));
+      nodes.Ch14.skeleton.bones[9].setRotationFromEuler(applyRotationLeft(keypoints.getLeftForearmAngle(kp)));
+      nodes.Ch14.skeleton.bones[28].setRotationFromEuler(applyRotationRight(keypoints.getRightArmAngle(kp)));
+      nodes.Ch14.skeleton.bones[29].setRotationFromEuler(applyRotationRight(keypoints.getRightForearmAngle(kp)));
     }
   })
+
+  const applyRotationLeft = (x) => {
+    return new THREE.Euler(x, 0, 0);
+  }
+
+  const applyRotationRight = (x) => {
+    return new THREE.Euler(-x, 0, 0);
+  }
 
   return (
     <group ref={group} {...props} dispose={null}>

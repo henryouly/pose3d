@@ -27,6 +27,7 @@ export const VIDEO_SIZE = {
 };
 export const STATE = {
   camera: {targetFPS: 60, sizeOption: '640 X 480'},
+  character: "Mousy",
   backend: '',
   flags: {},
   modelConfig: {}
