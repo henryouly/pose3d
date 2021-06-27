@@ -21,6 +21,7 @@ import * as params from './params';
 
 function DatGui(props) {
   const [model, setModel] = useState(SupportedModels.BlazePose);
+  const [backend, setBackend] = useState(null);
 
   useEffect(() => {
     const gui = new dat.GUI({ width: 300 });
@@ -39,8 +40,9 @@ function DatGui(props) {
 
     const modelController = modelFolder.add(
       params.STATE, 'model', Object.values(SupportedModels));
-    modelController.onChange(_ => {
+    modelController.onChange(model => {
       params.STATE.isModelChanged = true;
+      setModel(model);
       showModelConfigs(modelFolder);
       showBackendConfigs(backendFolder);
     });
@@ -51,7 +53,15 @@ function DatGui(props) {
     showBackendConfigs(backendFolder);
     backendFolder.open();
     return (() => {gui.destroy()})
-  })
+  }, [])
+
+  useEffect(() => {
+    props.updateModel(model);
+  }, [model]);
+
+  useEffect(() => {
+    props.updateBackend(backend);
+  }, [backend]);
 
   function showModelConfigs(folderController, type) {
     // Clean up model configs for the previous model.
@@ -113,7 +123,7 @@ function DatGui(props) {
 
     const typeController = modelConfigFolder.add(
       params.STATE.modelConfig, 'type', ['lite', 'full', 'heavy']);
-    typeController.onChange(_ => {
+    typeController.onChange(type => {
       // Set isModelChanged to true, so that we don't render any result during
       // changing models.
       params.STATE.isModelChanged = true;
@@ -133,10 +143,12 @@ function DatGui(props) {
     const backends = params.MODEL_BACKEND_MAP[params.STATE.model];
     // The first element of the array is the default backend for the model.
     params.STATE.backend = backends[0];
+    setBackend(params.STATE.backend);
     const backendController =
       folderController.add(params.STATE, 'backend', backends);
     backendController.name('runtime-backend');
     backendController.onChange(async backend => {
+      setBackend(backend);
       params.STATE.isBackendChanged = true;
     });
   }
