@@ -20,11 +20,8 @@ import { useEffect, useState } from 'react';
 import * as params from './params';
 
 function DatGui(props) {
-  const [modelParam, setModelParam] = useState({
-    model: SupportedModels.BlazePose,
-    backend: null,
-    type: null,
-  });
+  const [model, setModel] = useState(SupportedModels.BlazePose);
+  const [backend, setBackend] = useState(null);
 
   useEffect(() => {
     const gui = new dat.GUI({ width: 300 });
@@ -39,13 +36,13 @@ function DatGui(props) {
 
     // The model folder contains options for model selection.
     const modelFolder = gui.addFolder('Model');
-    params.STATE.model = modelParam.model;
+    params.STATE.model = model;
 
     const modelController = modelFolder.add(
       params.STATE, 'model', Object.values(SupportedModels));
     modelController.onChange(model => {
       params.STATE.isModelChanged = true;
-      setModelParam({...modelParam, model: model});
+      setModel(model);
       showModelConfigs(modelFolder);
       showBackendConfigs(backendFolder);
     });
@@ -59,8 +56,12 @@ function DatGui(props) {
   }, [])
 
   useEffect(() => {
-    props.updateModel(modelParam);
-  }, [modelParam]);
+    props.updateModel(model);
+  }, [model]);
+
+  useEffect(() => {
+    props.updateBackend(backend);
+  }, [backend]);
 
   function showModelConfigs(folderController, type) {
     // Clean up model configs for the previous model.
@@ -105,10 +106,9 @@ function DatGui(props) {
 
     const typeController = modelConfigFolder.add(
       params.STATE.modelConfig, 'type', ['lightning', 'thunder']);
-    typeController.onChange(type => {
+    typeController.onChange(_ => {
       // Set isModelChanged to true, so that we don't render any result during
       // changing models.
-      setModelParam({...modelParam, type: type});
       params.STATE.isModelChanged = true;
     });
 
@@ -126,7 +126,6 @@ function DatGui(props) {
     typeController.onChange(type => {
       // Set isModelChanged to true, so that we don't render any result during
       // changing models.
-      setModelParam({...modelParam, type: type});
       params.STATE.isModelChanged = true;
     });
 
@@ -144,11 +143,12 @@ function DatGui(props) {
     const backends = params.MODEL_BACKEND_MAP[params.STATE.model];
     // The first element of the array is the default backend for the model.
     params.STATE.backend = backends[0];
+    setBackend(params.STATE.backend);
     const backendController =
       folderController.add(params.STATE, 'backend', backends);
     backendController.name('runtime-backend');
     backendController.onChange(async backend => {
-      setModelParam({...modelParam, backend: backend});
+      setBackend(backend);
       params.STATE.isBackendChanged = true;
     });
   }
