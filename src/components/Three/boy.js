@@ -22,7 +22,6 @@ export default function Boy(props) {
       nodes.Boy01_Body_Geo.skeleton.bones[43].setRotationFromEuler(applyRotation(keypoints.getRightArmAngle(kp)));
       nodes.Boy01_Body_Geo.skeleton.bones[44].setRotationFromEuler(applyRotation(keypoints.getRightForearmAngle(kp)));
     }
-    console.log(nodes.Boy01_Body_Geo.skeleton.bones)
   })
 
   const applyRotation = (x) => {
