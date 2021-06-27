@@ -37,7 +37,7 @@ function getAngle(first, middle, last) {
 
 function getHeadRotation(kp) {
   if (kp[0].score < CONFIDENCE || kp[2].score < CONFIDENCE || kp[5].score < CONFIDENCE) {
-    return NO_ROTATION;
+    return new THREE.Euler(0, 0, 0);
   }
   const y = getYRotation(kp[2], kp[5], kp[0]);
   const z = getZRotation(kp[2], kp[5]);

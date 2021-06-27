@@ -157,41 +157,36 @@ const PosecamView = (props) => {
       });
   }
 
-  const setupDetector = async () => {
-    //await setBackendAndEnvFlags(STATE.flags, STATE.backend);
+  const setupDetector = async (callback) => {
+    await setBackendAndEnvFlags(STATE.flags, STATE.backend);
     detector.current = await createDetector();
+    callback();
   };
 
   const updateModel = (model) => {
     console.log(model);
-    cancelAnimationFrame(rafId.current);
+    if (rafId.current !== null) {
+      cancelAnimationFrame(rafId.current);
+    }
 
     if (detector.current !== null) {
-      detector.current.dispose()
+      detector.current.dispose();
     }
-    setupDetector();
-    animate();
+    setupDetector(() => animate());
   }
 
-  const updateBackend = async (backend) => {
-    console.log(backend);
-    await setBackendAndEnvFlags(STATE.flags, STATE.backend);
-  }
-
-  /*
   useEffect(() => {
-    // setupDetector();
-    //animate();
+    setupDetector(() => {});
+    animate();
 
     return (() => { cancelAnimationFrame(rafId.current) })
   });
-  */
 
   return (
     <div>
       <Webcam ref={webcamRef} mirrored style={style} />
       <canvas ref={canvasRef} style={style} />
-      <DatGui setCharacter={props.setCharacter} updateModel={updateModel} updateBackend={updateBackend}/>
+      <DatGui setCharacter={props.setCharacter} updateModel={updateModel}/>
     </div>
   )
 }
