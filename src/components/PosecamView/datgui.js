@@ -50,7 +50,8 @@ function DatGui(props) {
     const backendFolder = gui.addFolder('Backend');
     showBackendConfigs(backendFolder);
     backendFolder.open();
-  }, [])
+    return (() => {gui.destroy()})
+  })
 
   function showModelConfigs(folderController, type) {
     // Clean up model configs for the previous model.
