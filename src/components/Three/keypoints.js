@@ -1,47 +1,14 @@
-import * as THREE from "three";
+import { Vector3, Quaternion, Euler } from 'three';
 
 const CONFIDENCE = 0.5
-const NO_ROTATION = 0;
-
-function getLeftArmAngle(kp) {
-  if (kp[11].score < CONFIDENCE || kp[12].score < CONFIDENCE || kp[13].score < CONFIDENCE) {
-    return NO_ROTATION;
-  }
-  return getAngle(kp[12], kp[11], kp[13]);
-}
-
-function getLeftForearmAngle(kp) {
-  if (kp[11].score < CONFIDENCE || kp[13].score < CONFIDENCE || kp[15].score < CONFIDENCE) {
-    return NO_ROTATION;
-  }
-  return getAngle(kp[11], kp[13], kp[15]);
-}
-
-function getRightArmAngle(kp) {
-  if (kp[11].score < CONFIDENCE || kp[12].score < CONFIDENCE || kp[14].score < CONFIDENCE) {
-    return NO_ROTATION;
-  }
-  return getAngle(kp[11], kp[12], kp[14]);
-}
-
-function getRightForearmAngle(kp) {
-  if (kp[12].score < CONFIDENCE || kp[14].score < CONFIDENCE || kp[16].score < CONFIDENCE) {
-    return NO_ROTATION;
-  }
-  return getAngle(kp[12], kp[14], kp[16]);
-}
-
-function getAngle(first, middle, last) {
-  return Math.atan2(last.y - middle.y, last.x - middle.x) - Math.atan2(middle.y - first.y, middle.x - first.x);
-}
 
 function getHeadRotation(kp) {
   if (kp[0].score < CONFIDENCE || kp[2].score < CONFIDENCE || kp[5].score < CONFIDENCE) {
-    return new THREE.Euler(0, 0, 0);
+    return new Euler(0, 0, 0);
   }
   const y = getYRotation(kp[2], kp[5], kp[0]);
   const z = getZRotation(kp[2], kp[5]);
-  return new THREE.Euler(0, y, z);
+  return new Euler(0, y, z);
 }
 
 function getYRotation(p1, p2, pivot) {
@@ -60,4 +27,14 @@ function normalize(min, max, val) {
   return ((val - min) / (max - min)) * Math.PI;
 }
 
-export { getLeftArmAngle, getRightArmAngle, getHeadRotation, getLeftForearmAngle, getRightForearmAngle }
+function quaternionFrom(first, middle, last) {
+  const v1 = new Vector3();
+  v1.subVectors(first, middle).normalize();
+  const v2 = new Vector3();
+  v2.subVectors(middle, last).normalize();
+  const quaternion = new Quaternion();
+  quaternion.setFromUnitVectors(v1, v2);
+  return quaternion;
+}
+
+export { getHeadRotation, quaternionFrom }
