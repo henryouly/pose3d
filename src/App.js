@@ -7,7 +7,7 @@ import Characters from './components/Three/characters';
 
 function App() {
   const keypoints = useRef(null);
-  const [character, setCharacter] = useState("Mousy");
+  const [character, setCharacter] = useState("Boy");
 
   return (
     <>

@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei'
 
-import { Euler, Vector3 } from 'three';
+import { Euler, Quaternion, Vector3 } from 'three';
 import { quaternionFrom, getHeadRotation } from './keypoints';
 
 // Keypoints index:
@@ -11,33 +11,83 @@ export default function Boy(props) {
   let kp;
   const group = useRef()
   const { nodes, materials } = useGLTF('../../../boy.glb')
+  const initRotation = useRef(null);
 
   useFrame((state, delta) => {
     kp = props.keypoints.current
 
     if (typeof kp !== "undefined" && kp !== null) {
-      nodes.Boy01_Body_Geo.skeleton.bones[18].setRotationFromEuler(getHeadRotation(kp));
+      const nose = makeVector(kp[0]);
+      const lEyeInner = makeVector(kp[1]);
+      const lEye = makeVector(kp[2]);
+      const lEyeOuter = makeVector(kp[3]);
+      const rEyeInner = makeVector(kp[4]);
+      const rEye = makeVector(kp[5]);
+      const rEyeOuter = makeVector(kp[6]);
+      const lEar = makeVector(kp[7]);
+      const rEar = makeVector(kp[8]);
+      const lMouth = makeVector(kp[9]);
+      const rMouth = makeVector(kp[10]);
+      const lShoulder = makeVector(kp[11]);
+      const rShoulder = makeVector(kp[12]);
+      const lElbow = makeVector(kp[13]);
+      const rElbow = makeVector(kp[14]);
+      const lWrist = makeVector(kp[15]);
+      const rWrist = makeVector(kp[16]);
+      const lHip = makeVector(kp[23]);
+      const rHip = makeVector(kp[24]);
+      const lKnee = makeVector(kp[25]);
+      const rKnee = makeVector(kp[26]);
+      const lAnkle = makeVector(kp[27]);
+      const rAnkle = makeVector(kp[28]);
+      const lHeel = makeVector(kp[29]);
+      const rHeel = makeVector(kp[30]);
 
-      const lShoulder = new Vector3(kp[11].x, kp[11].y, kp[11].z);
-      const rShoulder = new Vector3(kp[12].x, kp[12].y, kp[12].z);
-      const lElbow = new Vector3(kp[13].x, kp[13].y, kp[13].z);
-      const rElbow = new Vector3(kp[14].x, kp[14].y, kp[14].z);
-      const lWrist = new Vector3(kp[15].x, kp[15].y, kp[15].z);
-      const rWrist = new Vector3(kp[16].x, kp[16].y, kp[16].z);
+      const hip = new Vector3((lHip.x + rHip.x) / 2, (lHip.y + rHip.y) / 2, (lHip.z + rHip.z) / 2);
+      const v1 = new Vector3();
+      v1.subVectors(lHip, hip);
+      const v2 = new Vector3();
+      v2.subVectors(rHip, hip);
+      const upward = new Vector3();
+      upward.crossVectors(v1, v2);
+      const quaternion = new Quaternion();
+      quaternion.setFromAxisAngle(upward, 0);
+      v1.applyQuaternion(quaternion);
+      //v1.add(hip);
+
+      const skeleton = nodes.Boy01_Body_Geo.skeleton;
+      const bones = skeleton.bones;
+
+      //bones[0].setRotationFromEuler(new Euler(0, 0, 0));
+      //bones[0].rotateOnAxis(new Vector3(1, 0, 0), Math.PI);
+
+      if (initRotation.current === null) {
+        initRotation.current = bones[0].quaternion;
+        console.log(initRotation.current);
+      } else {
+        const rotation = initRotation.current.clone();
+        //rotation.multiply()
+        bones[0].setRotationFromQuaternion(rotation);
+      }
+      bones[18].setRotationFromEuler(getHeadRotation(kp));
 
       const resetRotation = new Euler(0, 0, 0);
-      nodes.Boy01_Body_Geo.skeleton.bones[23].setRotationFromEuler(resetRotation);
-      nodes.Boy01_Body_Geo.skeleton.bones[24].setRotationFromEuler(resetRotation);
-      nodes.Boy01_Body_Geo.skeleton.bones[43].setRotationFromEuler(resetRotation);
-      nodes.Boy01_Body_Geo.skeleton.bones[44].setRotationFromEuler(resetRotation);
+      bones[23].setRotationFromEuler(resetRotation);
+      bones[24].setRotationFromEuler(resetRotation);
+      bones[43].setRotationFromEuler(resetRotation);
+      bones[44].setRotationFromEuler(resetRotation);
 
-      nodes.Boy01_Body_Geo.skeleton.bones[23].applyQuaternion(quaternionFrom(lElbow, lShoulder, rShoulder));
-      nodes.Boy01_Body_Geo.skeleton.bones[24].applyQuaternion(quaternionFrom(lWrist, lElbow, lShoulder));
-      nodes.Boy01_Body_Geo.skeleton.bones[43].applyQuaternion(
+      bones[23].applyQuaternion(quaternionFrom(lElbow, lShoulder, rShoulder));
+      bones[24].applyQuaternion(quaternionFrom(lWrist, lElbow, lShoulder));
+      bones[43].applyQuaternion(
         quaternionFrom(rElbow, rShoulder, lShoulder));
-      nodes.Boy01_Body_Geo.skeleton.bones[44].applyQuaternion(quaternionFrom(rWrist, rElbow, rShoulder));
+      bones[44].applyQuaternion(quaternionFrom(rWrist, rElbow, rShoulder));
     }
   })
+
+  const makeVector = (kp) => {
+    return new Vector3(kp.x, kp.y, kp.z);
+  }
 
   return (
     <group ref={group} {...props} dispose={null}>
