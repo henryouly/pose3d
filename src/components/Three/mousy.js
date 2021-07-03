@@ -24,16 +24,11 @@ export default function Mousy(props) {
       const rElbow = new Vector3(kp[14].z, kp[14].x, kp[14].y);
       const lWrist = new Vector3(kp[15].z, kp[15].x, kp[15].y);
       const rWrist = new Vector3(kp[16].z, kp[16].x, kp[16].y);
-      const resetRotation = new Euler(0, 0, 0);
-      nodes.Ch14.skeleton.bones[8].setRotationFromEuler(resetRotation);
-      nodes.Ch14.skeleton.bones[9].setRotationFromEuler(resetRotation);
-      nodes.Ch14.skeleton.bones[28].setRotationFromEuler(resetRotation);
-      nodes.Ch14.skeleton.bones[29].setRotationFromEuler(resetRotation);
-      nodes.Ch14.skeleton.bones[8].applyQuaternion(quaternionFrom(rShoulder, lShoulder, lElbow));
-      nodes.Ch14.skeleton.bones[9].applyQuaternion(quaternionFrom(lShoulder, lElbow, lWrist));
-      nodes.Ch14.skeleton.bones[28].applyQuaternion(
+      nodes.Ch14.skeleton.bones[8].setRotationFromQuaternion(quaternionFrom(rShoulder, lShoulder, lElbow));
+      nodes.Ch14.skeleton.bones[9].setRotationFromQuaternion(quaternionFrom(lShoulder, lElbow, lWrist));
+      nodes.Ch14.skeleton.bones[28].setRotationFromQuaternion(
         quaternionFrom(rElbow, rShoulder, lShoulder));
-      nodes.Ch14.skeleton.bones[29].applyQuaternion(quaternionFrom(rWrist, rElbow, rShoulder));
+      nodes.Ch14.skeleton.bones[29].setRotationFromQuaternion(quaternionFrom(rWrist, rElbow, rShoulder));
     }
   })
 

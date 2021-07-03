@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei'
 
-import { Euler, Quaternion, Vector3 } from 'three';
+import { ArrowHelper, Quaternion, Vector3 } from 'three';
 import { quaternionFrom, getHeadRotation } from './keypoints';
 
 // Keypoints index:
@@ -12,6 +12,7 @@ export default function Boy(props) {
   const group = useRef()
   const { nodes, materials } = useGLTF('../../../boy.glb')
   const initRotation = useRef(null);
+  const arrowHelperRef = useRef(null);
 
   useFrame((state, delta) => {
     kp = props.keypoints.current
@@ -43,18 +44,6 @@ export default function Boy(props) {
       const lHeel = makeVector(kp[29]);
       const rHeel = makeVector(kp[30]);
 
-      const hip = new Vector3((lHip.x + rHip.x) / 2, (lHip.y + rHip.y) / 2, (lHip.z + rHip.z) / 2);
-      const v1 = new Vector3();
-      v1.subVectors(lHip, hip);
-      const v2 = new Vector3();
-      v2.subVectors(rHip, hip);
-      const upward = new Vector3();
-      upward.crossVectors(v1, v2);
-      const quaternion = new Quaternion();
-      quaternion.setFromAxisAngle(upward, 0);
-      v1.applyQuaternion(quaternion);
-      //v1.add(hip);
-
       const skeleton = nodes.Boy01_Body_Geo.skeleton;
       const bones = skeleton.bones;
 
@@ -63,7 +52,9 @@ export default function Boy(props) {
 
       if (initRotation.current === null) {
         initRotation.current = bones[0].quaternion;
-        console.log(initRotation.current);
+        const arrowHelper = new ArrowHelper(new Vector3(1, 0, 0), new Vector3(0, 0, 0), 100, 0xff0000);
+        bones[0].add(arrowHelper);
+        arrowHelperRef.current = arrowHelper;
       } else {
         const rotation = initRotation.current.clone();
         //rotation.multiply()
@@ -71,11 +62,11 @@ export default function Boy(props) {
       }
       bones[18].setRotationFromEuler(getHeadRotation(kp));
 
-      bones[23].setRotationFromQuaternion(quaternionFrom(lElbow, lShoulder, rShoulder));
-      bones[24].setRotationFromQuaternion(quaternionFrom(lWrist, lElbow, lShoulder));
-      bones[43].setRotationFromQuaternion(
-        quaternionFrom(rElbow, rShoulder, lShoulder));
-      bones[44].setRotationFromQuaternion(quaternionFrom(rWrist, rElbow, rShoulder));
+      bones[23].setRotationFromQuaternion(quaternionFrom(rShoulder, lShoulder, lElbow).invert());
+      bones[24].setRotationFromQuaternion(quaternionFrom(lShoulder, lElbow, lWrist).invert());
+      bones[43].setRotationFromQuaternion(quaternionFrom(lShoulder, rShoulder, rElbow).invert());
+      bones[44].setRotationFromQuaternion(quaternionFrom(rShoulder, rElbow, rWrist).invert());
+      arrowHelperRef.current.setDirection(bones[24].position);
     }
   })
 

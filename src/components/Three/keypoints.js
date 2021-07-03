@@ -34,7 +34,7 @@ function quaternionFrom(first, middle, last) {
   v2.subVectors(middle, last).normalize();
   const quaternion = new Quaternion();
   quaternion.setFromUnitVectors(v1, v2);
-  return quaternion;
+  return quaternion.normalize();
 }
 
 export { getHeadRotation, quaternionFrom }
