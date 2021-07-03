@@ -13,6 +13,9 @@ export default function Boy(props) {
   const { nodes, materials } = useGLTF('../../../boy.glb')
   const initRotation = useRef(null);
   const arrowHelperRef = useRef(null);
+  const invertRotation = [];
+  const skeleton = nodes.Boy01_Body_Geo.skeleton;
+  const bones = skeleton.bones;
 
   useFrame((state, delta) => {
     kp = props.keypoints.current
@@ -44,9 +47,6 @@ export default function Boy(props) {
       const lHeel = makeVector(kp[29]);
       const rHeel = makeVector(kp[30]);
 
-      const skeleton = nodes.Boy01_Body_Geo.skeleton;
-      const bones = skeleton.bones;
-
       //bones[0].setRotationFromEuler(new Euler(0, 0, 0));
       //bones[0].rotateOnAxis(new Vector3(1, 0, 0), Math.PI);
 
@@ -57,20 +57,52 @@ export default function Boy(props) {
         arrowHelperRef.current = arrowHelper;
       } else {
         const rotation = initRotation.current.clone();
-        //rotation.multiply()
         bones[0].setRotationFromQuaternion(rotation);
       }
       bones[18].setRotationFromEuler(getHeadRotation(kp));
 
-      bones[23].setRotationFromQuaternion(quaternionFrom(rShoulder, lShoulder, lElbow).invert());
-      bones[24].setRotationFromQuaternion(quaternionFrom(lShoulder, lElbow, lWrist).invert());
-      bones[43].setRotationFromQuaternion(quaternionFrom(lShoulder, rShoulder, rElbow).invert());
-      bones[44].setRotationFromQuaternion(quaternionFrom(rShoulder, rElbow, rWrist).invert());
+      let angle;
+      angle = getAngle(rShoulder, lShoulder, lElbow) - Math.PI / 2;
+      setDirectionAndForward(23, quaternionFrom(rShoulder, lShoulder, lElbow).invert(), angle / 2);
+      setDirectionAndForward(24, quaternionFrom(lShoulder, lElbow, lWrist).invert(), angle, invertRotation[23]);
+      angle = normalizeRange(-getAngle(lShoulder, rShoulder, rElbow) + 1.5 * Math.PI, -2 * Math.PI, 0);
+      setDirectionAndForward(43, quaternionFrom(lShoulder, rShoulder, rElbow).invert(), angle / 2);
+      setDirectionAndForward(44, quaternionFrom(rShoulder, rElbow, rWrist).invert(), angle, invertRotation[43]);
       arrowHelperRef.current.setDirection(bones[24].position);
     }
   })
 
-  const makeVector = (kp) => {
+  function normalizeRange(angle, min, max) {
+    while (angle < min) {
+      angle += 2 * Math.PI;
+    }
+    while (angle > max) {
+      angle -= 2 * Math.PI;
+    }
+    return angle;
+  }
+
+  function getAngle(first, middle, last) {
+    return Math.atan2(last.y - middle.y, last.x - middle.x) - Math.atan2(middle.y - first.y, middle.x - first.x);
+  }
+
+  function setDirectionAndForward(boneIndex, dirQuaternion, rotateAngle, invertQuaternion = null) {
+    const quaternion = new Quaternion();
+    // warning: The multiply order of quaternion matters!
+    if (invertQuaternion !== null) {
+      quaternion.multiply(invertQuaternion);
+    }
+    quaternion.multiply(dirQuaternion);
+    quaternion.multiply(makeRotateQuaternion(rotateAngle));
+    bones[boneIndex].setRotationFromQuaternion(quaternion);
+    invertRotation[boneIndex] = makeRotateQuaternion(-rotateAngle);
+  }
+
+  function makeRotateQuaternion(rotationAngle) {
+    return new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), rotationAngle);    
+  }
+
+  function makeVector(kp) {
     return new Vector3(kp.x, kp.y, kp.z);
   }
 
