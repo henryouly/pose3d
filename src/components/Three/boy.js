@@ -71,17 +71,11 @@ export default function Boy(props) {
       }
       bones[18].setRotationFromEuler(getHeadRotation(kp));
 
-      const resetRotation = new Euler(0, 0, 0);
-      bones[23].setRotationFromEuler(resetRotation);
-      bones[24].setRotationFromEuler(resetRotation);
-      bones[43].setRotationFromEuler(resetRotation);
-      bones[44].setRotationFromEuler(resetRotation);
-
-      bones[23].applyQuaternion(quaternionFrom(lElbow, lShoulder, rShoulder));
-      bones[24].applyQuaternion(quaternionFrom(lWrist, lElbow, lShoulder));
-      bones[43].applyQuaternion(
+      bones[23].setRotationFromQuaternion(quaternionFrom(lElbow, lShoulder, rShoulder));
+      bones[24].setRotationFromQuaternion(quaternionFrom(lWrist, lElbow, lShoulder));
+      bones[43].setRotationFromQuaternion(
         quaternionFrom(rElbow, rShoulder, lShoulder));
-      bones[44].applyQuaternion(quaternionFrom(rWrist, rElbow, rShoulder));
+      bones[44].setRotationFromQuaternion(quaternionFrom(rWrist, rElbow, rShoulder));
     }
   })
 
